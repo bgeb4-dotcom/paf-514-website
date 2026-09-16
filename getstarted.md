@@ -79,7 +79,7 @@ You'll see the word "repository" used a lot in GitHub - it simply means "project
 
 > Tip: If you want to use a different URL for your website, check out the [FAQ](https://beautifuljekyll.com/faq/#custom-domain)
 
-  </div>
+ </div>
  
 ### 3. Customize your website settings
 
@@ -250,7 +250,7 @@ I'd also like to thank [Dr. Jekyll's Themes](https://drjekyllthemes.github.io/),
  .gs-section-01 h3{color:red;}
  .gs-section-01 p{font-size: 30px;}
 
- .gs-section-02 h3{color:blue;}
+ .gs-section-02 h2{color:blue;}
  .gs-section-02 p{font-size: 24px;}
  
 </style>
