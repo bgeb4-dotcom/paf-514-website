@@ -1,0 +1,220 @@
+---
+title: "Build an Interactive Oregon Healthcare Map in R"
+author: "Berit Gebhardt"
+output:
+  html_document:
+    theme: cosmo
+    highlight: tango
+    toc: true
+    toc_float: true
+---
+
+# Introduction 
+
+ Interactive maps can be useful for displaying the location of services, facilities, events or other geographic data in a format that is easy to explore. 
+
+In this tutorial, I will demonstrate how to create a simple interactive map of healthcare facilities in Oregon using the `leaflet` package in R. This example consists of a mix of large hospitals and community health centers in the Portland metro area and Washington County. We will start with a small dataset, map each location using latitude and longitude, and then add interactive markers, pop-up information, colors and a legend.  
+
+# Set Up 
+
+First, we will load the packages needed for the tutorial. 
+
+```{r}
+
+library(leaflet)
+
+```
+
+The `leaflet` package allows us to build interactive web maps directly in R. Each additional map feature can be added with the pipe operator (`%>%`), making it easier to build the map step by step.
+
+# Create a Healthcare Facility Dataset
+
+For this tutorial, we will use a small sample dataset containing real healthcare facilities in Oregon. The dataset includes the facility name, city, type and geographic coordinates. 
+
+```{r}
+
+health_sites <- data.frame(
+  facility = c(
+    "OHSU Hospital",
+    "Providence St. Vincent Medical Center",
+    "Legacy Emanuel Medical Center",
+    "Virginia Garcia Beaverton Wellness Center",
+    "Virginia Garcia Hillsboro Clinic",
+    "Virginia Garcia Cornelius Wellness Center"),
+
+  city = c(
+    "Portland",
+    "Portland",
+    "Portland",
+    "Beaverton",
+    "Hillsboro",
+    "Cornelius"),
+
+  type = c(
+    "Academic Medical Center",
+    "Hospital",
+    "Hospital",
+    "Community Health Center",
+    "Community Health Center",
+    "Community Health Center"),
+
+  latitude = c(
+    45.497722,
+    45.510627,
+    45.543342,
+    45.500577,
+    45.520804,
+    45.520702),
+
+  longitude = c(
+    -122.685914,
+    -122.772229,
+    -122.670975,
+    -122.809194,
+    -122.976716,
+    -123.057646))
+
+health_sites
+
+```
+
+Each row represents one healthcare facility, while the columns contain characteristics that are useful when building the map. 
+
+# Build the Basic Map 
+
+Now that the health sites data is created, we can build the map. The `leaflet()` function starts the map and `addTiles()` adds the standard map background. 
+
+```{r}
+
+leaflet(health_sites) %>%
+  addTiles()
+
+```
+
+# Add Healthcare Facility Markers
+
+Next, we will add a marker with the `addMarkers()` function for each facility using the latitude and longitude variables in the data. Each row in the dataset represents the location of one healthcare facility. 
+
+```{r}
+
+leaflet(health_sites) %>%
+  addTiles() %>%
+  addMarkers(
+    lng = ~longitude,
+    lat = ~latitude)
+
+```
+
+# Add Interactive Pop-Ups
+
+Markers become more useful when you can click on them and see additional information. We will display the facility name, city and facility type by using the `popup` function.
+
+```{r}
+
+leaflet(health_sites) %>%
+  addTiles() %>%
+  addMarkers(
+    lng = ~longitude,
+    lat = ~latitude,
+    popup = ~paste0(
+      "<b>", facility, "</b><br>",
+      "City: ", city, "<br>",
+      "Facility Type: ", type))
+
+```
+
+# Color Markers by Facility Type
+
+To make the map easier to interpret, we can assign different colors to different healthcare facility types. This allows the user to distinguish between hospitals, academic medical centers and community health centers. 
+
+First, we create a color palette with `colorFactor()`. The `domain` tells R which variable contains the categories that should receive different colors.
+
+```{r}
+
+site_colors <- colorFactor(
+  palette = c("blue", "green", "purple"),
+  domain = health_sites$type)
+
+```
+
+
+```{r}
+
+leaflet(health_sites) %>%
+  addTiles() %>%
+  addCircleMarkers(
+    lng = ~longitude,
+    lat = ~latitude,
+    radius = 8,
+    color = ~site_colors(type),
+    fillColor = ~site_colors(type),
+    fillOpacity = 0.8,
+    popup = ~paste0(
+      "<b>", facility, "</b><br>",
+      "City: ", city, "<br>",
+      "Facility Type: ", type ))
+
+```
+
+# Add a Legend
+
+A legend makes the color coding easier to interpret. We can use `addLegend()` and the same color palette that was used for the markers.
+```{r}
+
+leaflet(health_sites) %>%
+  addTiles() %>%
+  addCircleMarkers(
+    lng = ~longitude,
+    lat = ~latitude,
+    radius = 8,
+    color = ~site_colors(type),
+    fillColor = ~site_colors(type),
+    fillOpacity = 0.8,
+    popup = ~paste0(
+      "<b>", facility, "</b><br>",
+      "City: ", city, "<br>",
+      "Facility Type: ", type )) %>%
+  addLegend(
+    position = "bottomright",
+    pal = site_colors,
+    values = ~type,
+    title = "Facility Type")
+
+```
+
+# Final Interactive Map
+
+Now we can combine the map features into one version. The map includes Oregon healthcare locations, color-coded facility types, clickable pop-ups and a legend to help interpret locations.
+
+```{r}
+
+leaflet(health_sites) %>%
+  
+  addTiles() %>%
+  
+  addCircleMarkers(
+    lng = ~longitude,
+    lat = ~latitude,
+    radius = 8,
+    color = ~site_colors(type),
+    fillColor = ~site_colors(type),
+    fillOpacity = 0.8,
+    popup = ~paste0(
+      "<b>", facility, "</b><br>",
+      "City: ", city, "<br>",
+      "Facility Type: ", type)) %>%
+  
+  addLegend(
+    position = "bottomright",
+    pal = site_colors,
+    values = ~type,
+    title = "Facility Type")
+
+```
+
+# What We Learned
+
+In this tutorial, we created an interactive healthcare facility map using the `leaflet` package in R. We started with a small dataset consisting of facility names, locations, facility type and geographic coordinates. We then added map tiles, geographic markers, interactive pop-ups, color coding and a legend.
+
+This process can be adapted to many different types of geographic data, including schools, public services, nonprofits or other community resources. Interactive maps make geographic information easier to explore and understand than a traditional table. 
+  
